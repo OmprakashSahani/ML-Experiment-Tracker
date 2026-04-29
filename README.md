@@ -48,3 +48,21 @@ This project will follow:
 ```text
 Issue → Branch → Code → Test → PR → CI → Merge → Release
 ```
+---
+
+## Completed Workflow 1: Initial Project Structure
+
+### Issue
+Created Issue #1 to initialize the project structure.
+
+### Codex Usage
+Used Codex to generate the initial project layout and tests.
+
+### Files Added
+- `pyproject.toml`
+- `src/mltracker/__init__.py`
+- `src/mltracker/cli.py`
+- `tests/test_cli.py`
+
+### Result
+The project now has a clean `src/` structure with an initial CLI and test.
