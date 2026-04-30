@@ -160,3 +160,41 @@ def test_list_runs_continues_when_multiple_malformed_files_exist(tmp_path, capsy
     assert "- run-a | " in output
     assert "WARNING: Skipping malformed run file 'bad1.json'" in output
     assert "WARNING: Skipping malformed run file 'bad2.json'" in output
+
+
+def test_compare_runs_with_all_metrics_when_metric_not_provided(tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    main(["create-run", "--name", "run-a"])
+    run_a = list((tmp_path / "runs").glob("*.json"))[0]
+    main(["log-metric", "--run-file", str(run_a), "--name", "accuracy", "--value", "0.9"])
+
+    main(["create-run", "--name", "run-b"])
+    run_b = sorted((tmp_path / "runs").glob("*.json"))[-1]
+    main(["log-metric", "--run-file", str(run_b), "--name", "loss", "--value", "0.2"])
+
+    capsys.readouterr()
+    main(["compare-runs", str(run_a), str(run_b)])
+
+    output = capsys.readouterr().out
+    assert "- run-a | accuracy=0.9, loss=<missing>" in output
+    assert "- run-b | accuracy=<missing>, loss=0.2" in output
+
+
+def test_compare_runs_with_specific_metric_only(tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    main(["create-run", "--name", "run-a"])
+    run_a = list((tmp_path / "runs").glob("*.json"))[0]
+    main(["log-metric", "--run-file", str(run_a), "--name", "accuracy", "--value", "0.9"])
+
+    main(["create-run", "--name", "run-b"])
+    run_b = sorted((tmp_path / "runs").glob("*.json"))[-1]
+
+    capsys.readouterr()
+    main(["compare-runs", str(run_a), str(run_b), "--metric", "accuracy"])
+
+    output = capsys.readouterr().out
+    assert "- run-a | accuracy=0.9" in output
+    assert "- run-b | accuracy=<missing>" in output
+    assert "loss=" not in output
