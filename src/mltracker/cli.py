@@ -37,6 +37,22 @@ def create_run(name: str) -> Path:
     return run_file
 
 
+def log_metric(run_file: str, name: str, value: float) -> Path:
+    """Log a metric value to an existing run JSON file."""
+    run_path = Path(run_file)
+    payload = json.loads(run_path.read_text(encoding="utf-8"))
+
+    metrics = payload.get("metrics")
+    if not isinstance(metrics, dict):
+        metrics = {}
+
+    metrics[name] = float(value)
+    payload["metrics"] = metrics
+
+    run_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return run_path
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser."""
     parser = argparse.ArgumentParser(prog="mltracker")
@@ -44,6 +60,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     create_run_parser = subparsers.add_parser("create-run", help="Create an experiment run")
     create_run_parser.add_argument("--name", required=True, help="Run name")
+
+    log_metric_parser = subparsers.add_parser("log-metric", help="Log a metric to a run")
+    log_metric_parser.add_argument("--run-file", required=True, help="Path to run JSON file")
+    log_metric_parser.add_argument("--name", required=True, help="Metric name")
+    log_metric_parser.add_argument("--value", required=True, type=float, help="Metric value")
 
     return parser
 
@@ -56,6 +77,9 @@ def main(argv: list[str] | None = None) -> None:
     if args.command == "create-run":
         run_path = create_run(args.name)
         print(f"Created run: {run_path}")
+    elif args.command == "log-metric":
+        run_path = log_metric(args.run_file, args.name, args.value)
+        print(f"Updated run: {run_path}")
     else:
         print("ML Experiment Tracker")
 
