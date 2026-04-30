@@ -198,3 +198,40 @@ def test_compare_runs_with_specific_metric_only(tmp_path, capsys, monkeypatch):
     assert "- run-a | accuracy=0.9" in output
     assert "- run-b | accuracy=<missing>" in output
     assert "loss=" not in output
+
+
+def test_compare_runs_skips_malformed_json_and_shows_warning(tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    main(["create-run", "--name", "valid-run"])
+    valid_run = list((tmp_path / "runs").glob("*.json"))[0]
+    main(["log-metric", "--run-file", str(valid_run), "--name", "accuracy", "--value", "0.88"])
+    malformed_run = tmp_path / "runs" / "broken.json"
+    malformed_run.write_text('{"name":"bad",', encoding="utf-8")
+
+    capsys.readouterr()
+    main(["compare-runs", str(valid_run), str(malformed_run)])
+
+    output = capsys.readouterr().out
+    assert "- valid-run | accuracy=0.88" in output
+    assert "WARNING: Skipping malformed run file 'broken.json'" in output
+
+
+def test_compare_runs_continues_with_multiple_malformed_files(tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    main(["create-run", "--name", "run-a"])
+    run_a = list((tmp_path / "runs").glob("*.json"))[0]
+    main(["log-metric", "--run-file", str(run_a), "--name", "accuracy", "--value", "0.9"])
+
+    runs_dir = tmp_path / "runs"
+    (runs_dir / "bad1.json").write_text("{", encoding="utf-8")
+    (runs_dir / "bad2.json").write_text("not-json", encoding="utf-8")
+
+    capsys.readouterr()
+    main(["compare-runs", str(run_a), str(runs_dir / "bad1.json"), str(runs_dir / "bad2.json")])
+
+    output = capsys.readouterr().out
+    assert "- run-a | accuracy=0.9" in output
+    assert "WARNING: Skipping malformed run file 'bad1.json'" in output
+    assert "WARNING: Skipping malformed run file 'bad2.json'" in output
