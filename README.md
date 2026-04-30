@@ -48,6 +48,7 @@ This project will follow:
 ```text
 Issue → Branch → Code → Test → PR → CI → Merge → Release
 ```
+
 ---
 
 ## Completed Workflow 1: Initial Project Structure
@@ -67,7 +68,6 @@ Used Codex to generate the initial project layout and tests.
 ### Result
 The project now has a clean `src/` structure with an initial CLI and test.
 
-
 ---
 
 ## Installation
@@ -76,46 +76,7 @@ The project now has a clean `src/` structure with an initial CLI and test.
 pip install -e .
 ```
 
-## Current CLI Commands
-
-Install the package first, then run the CLI:
-
-```bash
-pip install -e .
-mltracker <command> [options]
-```
-
-### `create-run`
-
-Creates a new run JSON file under `runs/`.
-
-**Example command**
-
-```bash
-mltracker create-run --name "baseline-model"
-```
-
-**Expected output**
-
-```text
-Created run: runs/<UTC_TIMESTAMP>_baseline-model.json
-```
-
-### `log-metric`
-
-Adds or updates a metric in an existing run JSON file.
-
-**Example command**
-
-```bash
-mltracker log-metric   --run-file "runs/<UTC_TIMESTAMP>_baseline-model.json"   --name accuracy   --value 0.91
-```
-
-**Expected output**
-
-```text
-Updated run: runs/<UTC_TIMESTAMP>_baseline-model.json
-```
+Optional (development usage): use `python -m mltracker.cli` if not installed.
 
 ## Usage
 
