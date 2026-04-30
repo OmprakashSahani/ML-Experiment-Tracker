@@ -8,6 +8,15 @@ version = "0.1.0"
 description = "ML Experiment Tracker"
 requires-python = ">=3.9"
 
+[project.scripts]
+mltracker = "mltracker.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 addopts = "-q"
