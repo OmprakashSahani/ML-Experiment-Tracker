@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -11,12 +12,19 @@ from pathlib import Path
 RUNS_DIR = Path("runs")
 
 
+def sanitize_run_name(name: str) -> str:
+    """Sanitize a run name so it is safe to use as part of a filename."""
+    normalized = name.strip().replace(" ", "_")
+    safe_name = re.sub(r"[^A-Za-z0-9._-]", "_", normalized)
+    return safe_name or "run"
+
+
 def create_run(name: str) -> Path:
     """Create a run JSON file in the local runs directory."""
     RUNS_DIR.mkdir(exist_ok=True)
 
     timestamp = datetime.now(timezone.utc).isoformat()
-    safe_name = name.strip().replace(" ", "_")
+    safe_name = sanitize_run_name(name)
     run_file = RUNS_DIR / f"{timestamp.replace(':', '-')}_{safe_name}.json"
 
     payload = {
