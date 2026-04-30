@@ -70,12 +70,19 @@ The project now has a clean `src/` structure with an initial CLI and test.
 
 ---
 
-## Current CLI Commands
-
-Use the CLI module directly from the repository root:
+## Installation
 
 ```bash
-PYTHONPATH=src python -m mltracker.cli <command> [options]
+pip install -e .
+```
+
+## Current CLI Commands
+
+Install the package first, then run the CLI:
+
+```bash
+pip install -e .
+mltracker <command> [options]
 ```
 
 ### `create-run`
@@ -85,7 +92,7 @@ Creates a new run JSON file under `runs/`.
 **Example command**
 
 ```bash
-PYTHONPATH=src python -m mltracker.cli create-run --name "baseline-model"
+mltracker create-run --name "baseline-model"
 ```
 
 **Expected output**
@@ -101,7 +108,7 @@ Adds or updates a metric in an existing run JSON file.
 **Example command**
 
 ```bash
-PYTHONPATH=src python -m mltracker.cli log-metric   --run-file "runs/<UTC_TIMESTAMP>_baseline-model.json"   --name accuracy   --value 0.91
+mltracker log-metric   --run-file "runs/<UTC_TIMESTAMP>_baseline-model.json"   --name accuracy   --value 0.91
 ```
 
 **Expected output**
@@ -117,7 +124,7 @@ Follow this end-to-end workflow to track and compare experiments.
 ### 1) Create a run
 
 ```bash
-PYTHONPATH=src python -m mltracker.cli create-run --name baseline
+mltracker create-run --name baseline
 ```
 
 Example output:
@@ -129,7 +136,7 @@ Created run: runs/20260430T120000Z_baseline.json
 ### 2) Log metrics
 
 ```bash
-PYTHONPATH=src python -m mltracker.cli log-metric --run-file runs/<file>.json --name accuracy --value 0.95
+mltracker log-metric --run-file runs/<file>.json --name accuracy --value 0.95
 ```
 
 Example output:
@@ -141,7 +148,7 @@ Updated run: runs/20260430T120000Z_baseline.json
 ### 3) List runs
 
 ```bash
-PYTHONPATH=src python -m mltracker.cli list-runs
+mltracker list-runs
 ```
 
 Example output:
@@ -154,7 +161,7 @@ Example output:
 ### 4) Compare runs
 
 ```bash
-PYTHONPATH=src python -m mltracker.cli compare-runs runs/<file1>.json runs/<file2>.json
+mltracker compare-runs runs/<file1>.json runs/<file2>.json
 ```
 
 Example output:
@@ -165,7 +172,7 @@ Example output:
 ```
 
 ```bash
-PYTHONPATH=src python -m mltracker.cli compare-runs runs/<file1>.json runs/<file2>.json --metric accuracy
+mltracker compare-runs runs/<file1>.json runs/<file2>.json --metric accuracy
 ```
 
 Example output:
