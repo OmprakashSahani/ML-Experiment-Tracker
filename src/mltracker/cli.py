@@ -58,6 +58,28 @@ def log_metric(run_file: str, name: str, value: float) -> Path:
     return run_path
 
 
+def list_runs() -> list[str]:
+    """List run summaries from JSON files in the local runs directory."""
+    if not RUNS_DIR.exists():
+        return ["No runs found yet. Create one with: mltracker create-run --name <run-name>"]
+
+    lines: list[str] = []
+    run_files = sorted(RUNS_DIR.glob("*.json"))
+    if not run_files:
+        return ["No runs found in runs/."]
+
+    for run_file in run_files:
+        payload = json.loads(run_file.read_text(encoding="utf-8"))
+        run_name = payload.get("name", "(unnamed)")
+        timestamp = payload.get("timestamp", "(missing timestamp)")
+        metrics = payload.get("metrics")
+        metric_keys = sorted(metrics.keys()) if isinstance(metrics, dict) and metrics else []
+        metric_text = ", ".join(metric_keys) if metric_keys else "none"
+        lines.append(f"- {run_name} | {timestamp} | metrics: {metric_text}")
+
+    return lines
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser."""
     parser = argparse.ArgumentParser(prog="mltracker")
@@ -70,6 +92,7 @@ def build_parser() -> argparse.ArgumentParser:
     log_metric_parser.add_argument("--run-file", required=True, help="Path to run JSON file")
     log_metric_parser.add_argument("--name", required=True, help="Metric name")
     log_metric_parser.add_argument("--value", required=True, type=float, help="Metric value")
+    subparsers.add_parser("list-runs", help="List tracked runs")
 
     return parser
 
@@ -85,6 +108,9 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "log-metric":
         run_path = log_metric(args.run_file, args.name, args.value)
         print(f"Updated run: {run_path}")
+    elif args.command == "list-runs":
+        for line in list_runs():
+            print(line)
     else:
         print("ML Experiment Tracker")
 
