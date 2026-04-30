@@ -103,3 +103,28 @@ def test_log_metric_rejects_non_finite_values(tmp_path, monkeypatch, bad_value):
 
     payload = json.loads(run_file.read_text(encoding="utf-8"))
     assert "metrics" not in payload
+
+
+def test_list_runs_handles_missing_runs_dir(tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    main(["list-runs"])
+
+    captured = capsys.readouterr()
+    assert "No runs found yet." in captured.out
+
+
+def test_list_runs_displays_run_name_timestamp_and_metric_keys(tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    main(["create-run", "--name", "baseline"])
+    run_file = list((tmp_path / "runs").glob("*.json"))[0]
+    main(["log-metric", "--run-file", str(run_file), "--name", "accuracy", "--value", "0.95"])
+    main(["log-metric", "--run-file", str(run_file), "--name", "loss", "--value", "0.42"])
+
+    capsys.readouterr()
+    main(["list-runs"])
+
+    output = capsys.readouterr().out
+    assert "- baseline | " in output
+    assert "metrics: accuracy, loss" in output
