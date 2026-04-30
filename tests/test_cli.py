@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from mltracker.cli import main
 
 
@@ -87,3 +89,17 @@ def test_log_metric_updates_existing_metric_value(tmp_path, monkeypatch):
 
     payload = json.loads(run_file.read_text(encoding="utf-8"))
     assert payload["metrics"]["loss"] == 1.75
+
+
+@pytest.mark.parametrize("bad_value", ["nan", "inf", "-inf"])
+def test_log_metric_rejects_non_finite_values(tmp_path, monkeypatch, bad_value):
+    monkeypatch.chdir(tmp_path)
+
+    main(["create-run", "--name", "baseline"])
+    run_file = list((tmp_path / "runs").glob("*.json"))[0]
+
+    with pytest.raises(ValueError, match=r"must be a finite number"):
+        main(["log-metric", "--run-file", str(run_file), "--name", "loss", f"--value={bad_value}"])
+
+    payload = json.loads(run_file.read_text(encoding="utf-8"))
+    assert "metrics" not in payload

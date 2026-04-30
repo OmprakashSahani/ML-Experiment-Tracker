@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -46,7 +47,11 @@ def log_metric(run_file: str, name: str, value: float) -> Path:
     if not isinstance(metrics, dict):
         metrics = {}
 
-    metrics[name] = float(value)
+    metric_value = float(value)
+    if not math.isfinite(metric_value):
+        raise ValueError(f"Metric '{name}' must be a finite number; got {metric_value!r}.")
+
+    metrics[name] = metric_value
     payload["metrics"] = metrics
 
     run_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
