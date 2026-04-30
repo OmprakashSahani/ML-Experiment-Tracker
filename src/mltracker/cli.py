@@ -69,7 +69,14 @@ def list_runs() -> list[str]:
         return ["No runs found in runs/."]
 
     for run_file in run_files:
-        payload = json.loads(run_file.read_text(encoding="utf-8"))
+        try:
+            payload = json.loads(run_file.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            lines.append(
+                f"WARNING: Skipping malformed run file '{run_file.name}': {exc.msg}"
+            )
+            continue
+
         run_name = payload.get("name", "(unnamed)")
         timestamp = payload.get("timestamp", "(missing timestamp)")
         metrics = payload.get("metrics")
