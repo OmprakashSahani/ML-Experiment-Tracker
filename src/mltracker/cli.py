@@ -89,12 +89,20 @@ def list_runs() -> list[str]:
 
 def compare_runs(run_files: list[str], metric: str | None = None) -> list[str]:
     """Compare metrics across one or more run JSON files."""
+    lines: list[str] = []
     rows: list[tuple[str, dict[str, object]]] = []
     all_metrics: set[str] = set()
 
     for run_file in run_files:
         run_path = Path(run_file)
-        payload = json.loads(run_path.read_text(encoding="utf-8"))
+        try:
+            payload = json.loads(run_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            lines.append(
+                f"WARNING: Skipping malformed run file '{run_path.name}': {exc.msg}"
+            )
+            continue
+
         run_name = payload.get("name")
         if not isinstance(run_name, str) or not run_name:
             run_name = run_path.stem
@@ -106,9 +114,9 @@ def compare_runs(run_files: list[str], metric: str | None = None) -> list[str]:
 
     metric_names = [metric] if metric else sorted(all_metrics)
     if not metric_names:
-        return ["No metrics found across the provided run files."]
+        lines.append("No metrics found across the provided run files.")
+        return lines
 
-    lines: list[str] = []
     for run_name, metrics in rows:
         values: list[str] = []
         for metric_name in metric_names:
