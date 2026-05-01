@@ -153,10 +153,12 @@ Example output:
 
 ## 📊 Example Results
 
-This project can be used to track and compare experiment metrics.
+This project tracks and compares experiment metrics across runs.
 
 ## Accuracy Comparison
 
 ![Accuracy Comparison](docs/accuracy.png)
+
+Higher accuracy indicates better model performance under the same setup.
 
 ---
