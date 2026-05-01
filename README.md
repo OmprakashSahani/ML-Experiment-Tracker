@@ -145,8 +145,18 @@ Example output:
 - tuned    | accuracy=0.97
 ```
 
-### 🎬 CLI Demo
+---
+
+## 🎬 CLI Demo
 
 ![CLI Demo](docs/cli-demo.PNG)
+
+## 📊 Example Results
+
+This project can be used to track and compare experiment metrics.
+
+## Accuracy Comparison
+
+![Accuracy Comparison](docs/accuracy.png)
 
 ---
