@@ -127,7 +127,7 @@ Output:
 
 ## CLI Demo
 
-![CLI Demo](docs/cli_demo.gif)
+![CLI Demo](docs/cli-demo.PNG)
 
 ---
 
@@ -135,7 +135,7 @@ Output:
 
 ### Accuracy Comparison
 
-![Accuracy Comparison](docs/accuracy_comparison.png)
+![Accuracy Comparison](docs/accuracy.png)
 
 Higher accuracy indicates improved model performance under comparable configurations.
 
